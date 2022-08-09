@@ -4,9 +4,13 @@ from collections import deque
 # N , M ,T 입력받기
 
 N, M, T = map(int, input().split())
-
 graph = []
 visited = [[0 for _ in range(M)] for _ in range(N)]
+
+# miro값 입력받기
+for _ in range(M):
+    miro = list(map(int, input().split()))
+    graph.append(miro)
 
 #이동할 방향
 dx = [-1,1,0,0]
@@ -17,33 +21,37 @@ result=0
 
 # 검을 가지게 될 때 실행될 함수
 def bfs2(x, y,t):
-    print('여기는 들어옴?')
     queue = deque()
-    queue.append((x, y,t))
+    queue.append((x, y, t))
 
     while queue:
         x, y,t = queue.popleft()
+
+        if (t > T):
+            result = 'Fail'
+            break
 
         for i in range(4):
             nx = x + dx[i]
             ny = y + dy[i]
 
-        if nx < 0 or ny < 0 or nx >= M or ny >= N:
-            continue
+            if ny == (M - 1) and nx == (N - 1):
+                graph[ny][nx] = graph[y][x] + 1
 
-        if (graph[ny][nx] < graph[y][x] and graph[ny][nx]!=0) or graph[ny][nx] > graph[y][x]:
-            continue
+                result = graph[ny][nx]
+                break
 
-        if graph[ny][nx]==0 or graph[ny][nx]==1:
-            graph[ny][nx] = graph[y][x] + 1
-            queue.append((nx, ny))
-            continue
+            if nx < 0 or ny < 0 or nx >= M or ny >= N:
+                continue
 
-        if graph[ny][nx] == graph[M-1][N-1]:
-            graph[ny][nx] = graph[y][x] + 1
-            result = graph[ny][nx]
+            if (graph[ny][nx] < graph[y][x] and graph[ny][nx]!=0) or graph[ny][nx] > graph[y][x]:
+                continue
 
-            return result
+            if (graph[ny][nx]==0 and visited[ny][nx]==0) or (graph[ny][nx]==1 or  visited[ny][nx]==0):
+                visited[ny][nx] = 1
+                graph[ny][nx] = graph[y][x] + 1
+                queue.append((nx, ny, graph[ny][nx]))
+
 
 # 함수 정의
 def bfs(x, y, t):
@@ -52,76 +60,52 @@ def bfs(x, y, t):
     queue.append((x,y,t))
     visited[y][x] = 1
 
+
+
     while queue:
-
+        print(t)
         print(queue)
-
         x, y, t= queue.popleft()
 
-
+        if (t > T):
+            result = 'Fail'
+            break
 
         for i in range(4):
             nx = x+dx[i]
             ny = y+dy[i]
 
-            if (t>T):
-                print('1')
-                result = 'Fail'
-                return result
-
             if ny == (M-1) and  nx == (N-1):
-                print('2')
                 graph[ny][nx] = graph[y][x] + 1
 
-                result = graph[ny][nx]
+                result= graph[ny][nx]
 
-                return result
+                break
 
-            if nx<0 or ny<0 or nx>=M or ny >=N:
-                print('3')
+            if nx<0 or ny<0 or nx>=N-1 or ny >=M-1:
 
-                continue
-
-            if (graph[ny][nx] < graph[y][x]and graph[ny][nx]!=0) or graph[ny][nx] > graph[y][x] :
-                print('4')
                 continue
 
             if graph[ny][nx] == 1:
-                print('5')
-                continue
-
-            if graph[ny][nx]==0:
-                print('6')
-                visited[ny][nx] == 1
-                t = t+1
-                graph[ny][nx] = graph[y][x]-1
-                queue.append((nx,ny,t))
                 continue
 
             if graph[ny][nx] == 2 and visited[ny][nx] == 0:
-                print('7')
-                visited[ny][nx] == 1
-                t = t + 1
+                print('와우우우')
+                visited[ny][nx] = 1
+                graph[ny][nx] = graph[y][x] + 1
                 while queue:
                     queue.popleft()
-                bfs2(nx,ny,t)
+                bfs2(nx,ny,graph[ny][nx])
 
+            if graph[ny][nx] == 0 and visited[ny][nx]!=1:
+                visited[ny][nx] = 1
+                graph[ny][nx] = graph[y][x] + 1
+                queue.append((nx, ny, graph[ny][nx]))
 
-
-
-# miro값 입력받기
-for _ in range(M):
-    miro = list(map(int, input().split()))
-    graph.append(miro)
 
 
 
 bfs(0,0,0)
 
-print('답은 말이죠')
 print(result)
-if (result<T):
-    print('Fail')
-else:
-    print(result)
 
